@@ -1,0 +1,11 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: static-path-provisioner
+spec:
+  template:
+    spec:
+      serviceAccountName: static-path-provisioner
+      containers:
+      - name: static-path-provisioner
+        image: ghcr.io/viz-software/static-path-provisioner

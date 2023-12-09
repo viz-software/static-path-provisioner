@@ -1,0 +1,94 @@
+allowVolumeExpansion: true
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  annotations:
+    storageclass.kubernetes.io/is-default-class: "true"
+  labels:
+    app: static-path-provisioner
+  name: static-path
+provisioner: viz.software/static-path-provisioner
+volumeBindingMode: WaitForFirstConsumer
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  labels:
+    app: static-path-provisioner
+  name: static-path-provisioner
+  namespace: kube-system
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  labels:
+    app: static-path-provisioner
+  name: static-path-provisioner
+rules:
+- apiGroups:
+  - ""
+  resources:
+  - persistentvolumes
+  verbs:
+  - '*'
+- apiGroups:
+  - ""
+  resources:
+  - persistentvolumeclaims
+  - nodes
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - storage.k8s.io
+  resources:
+  - storageclasses
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - ""
+  resources:
+  - events
+  verbs:
+  - create
+  - update
+  - patch
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  labels:
+    app: static-path-provisioner
+  name: static-path-provisioner
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: static-path-provisioner
+subjects:
+- kind: ServiceAccount
+  name: static-path-provisioner
+  namespace: kube-system
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: static-path-provisioner
+  name: static-path-provisioner
+  namespace: kube-system
+spec:
+  selector:
+    matchLabels:
+      app: static-path-provisioner
+  template:
+    metadata:
+      labels:
+        app: static-path-provisioner
+    spec:
+      containers:
+      - image: ghcr.io/viz-software/static-path-provisioner
+        name: static-path-provisioner
+      serviceAccountName: static-path-provisioner

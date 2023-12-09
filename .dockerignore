@@ -1,0 +1,6 @@
+*
+
+# source
+!/go.mod
+!/go.sum
+!/cmd/

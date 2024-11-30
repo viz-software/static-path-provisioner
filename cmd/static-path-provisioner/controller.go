@@ -3,11 +3,12 @@ package main
 import (
 	"github.com/pkg/errors"
 	"k8s.io/client-go/kubernetes"
-	"sigs.k8s.io/sig-storage-lib-external-provisioner/v8/controller"
+	"k8s.io/klog/v2"
+	"sigs.k8s.io/sig-storage-lib-external-provisioner/v10/controller"
 )
 
 // NewController creates a provisioner controller
-func NewController(clientset *kubernetes.Clientset) (*controller.ProvisionController, error) {
+func NewController(logger klog.Logger, clientset *kubernetes.Clientset) (*controller.ProvisionController, error) {
 	var err error
 
 	// construct the static path provisioner
@@ -21,7 +22,7 @@ func NewController(clientset *kubernetes.Clientset) (*controller.ProvisionContro
 		controller.LeaderElection(false),
 		controller.Threadiness(1),
 	}
-	provisionController := controller.NewProvisionController(clientset, "viz.software/static-path-provisioner", provisioner, opts...)
+	provisionController := controller.NewProvisionController(logger, clientset, "viz.software/static-path-provisioner", provisioner, opts...)
 
 	return provisionController, nil
 }

@@ -10,6 +10,9 @@ import (
 func main() {
 	var err error
 
+	ctx := context.Background()
+	logger := klog.FromContext(ctx)
+
 	klog.Infof("%s %s", APPNAME, VERSION)
 
 	// construct the clientset to interact with Kubernetes APIs
@@ -19,7 +22,7 @@ func main() {
 	}
 
 	// construct the provisioner controller
-	controller, err := NewController(clientset)
+	controller, err := NewController(logger, clientset)
 	if err != nil {
 		klog.Fatalf("Critical error: %v", errors.Wrap(err, "unable to create controller"))
 	}
